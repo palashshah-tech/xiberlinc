@@ -1,10 +1,12 @@
 import { useState } from 'react'
+import { translations } from './translations'
 import './LoginPage.css'
 
 const DEMO = { email: 'demo@xiberlinc.com', password: 'xiberlinc2025' }
 const DEMO_USER = { email: 'demo@xiberlinc.com', name: 'Maro Machizawa', plan: 'Professional' }
 
-export default function LoginPage({ onLogin }) {
+export default function LoginPage({ onLogin, lang }) {
+  const t = translations[lang]
   const [email, setEmail]       = useState('')
   const [password, setPassword] = useState('')
   const [showPw, setShowPw]     = useState(false)
@@ -39,10 +41,12 @@ export default function LoginPage({ onLogin }) {
           <div className="lp-visual-text">
             <p className="lp-visual-eyebrow" style={{ visibility: 'hidden' }}>Neural Interface Platform</p>
             <h1 className="lp-visual-headline">
-              Decode<br />the mind.
+              {t.decode_mind.split('\n').map((line, i) => (
+                <span key={i}>{line}{i === 0 && <br />}</span>
+              ))}
             </h1>
             <p className="lp-visual-body">
-              Real-time emotion AI and adaptive neurofeedback — engineered for the next generation of human-computer interaction.
+              {t.brand_sub}
             </p>
           </div>
           <div className="lp-visual-badges" style={{ visibility: 'hidden' }}>
@@ -65,24 +69,24 @@ export default function LoginPage({ onLogin }) {
                   <polyline points="20 6 9 17 4 12"/>
                 </svg>
               </div>
-              <p>Signing you in…</p>
+              <p>{t.signing_in}</p>
             </div>
           ) : (
             <>
               <div className="lp-panel-head">
-                <h2>Sign in</h2>
-                <p>Access your xiberlinc research suite</p>
+                <h2>{t.signin}</h2>
+                <p>{t.access_suite}</p>
               </div>
 
               <form onSubmit={submit} className="lp-form">
                 <div className="lp-field">
-                  <label htmlFor="lp-email">Email</label>
+                  <label htmlFor="lp-email">{t.email}</label>
                   <input
                     id="lp-email"
                     type="email"
                     value={email}
                     onChange={e => { setEmail(e.target.value); setError('') }}
-                    placeholder="you@xiberlinc.com"
+                    placeholder={`you@xiberlinc.com`}
                     autoComplete="email"
                     required
                   />
@@ -90,8 +94,8 @@ export default function LoginPage({ onLogin }) {
 
                 <div className="lp-field">
                   <div className="lp-field-row">
-                    <label htmlFor="lp-pw">Password</label>
-                    <button type="button" className="lp-text-btn">Forgot?</button>
+                    <label htmlFor="lp-pw">{t.password}</label>
+                    <button type="button" className="lp-text-btn">{t.forgot}</button>
                   </div>
                   <div className="lp-pw-wrap">
                     <input
@@ -104,7 +108,7 @@ export default function LoginPage({ onLogin }) {
                       required
                     />
                     <button type="button" className="lp-eye" onClick={() => setShowPw(s => !s)}>
-                      {showPw ? 'Hide' : 'Show'}
+                      {showPw ? t.hide : t.show}
                     </button>
                   </div>
                 </div>
@@ -119,22 +123,22 @@ export default function LoginPage({ onLogin }) {
                 >
                   {loading
                     ? <span className="lp-spinner" />
-                    : 'Continue →'
+                    : t.continue
                   }
                 </button>
               </form>
 
-              <div className="lp-sep"><span>Demo access</span></div>
+              <div className="lp-sep"><span>{t.demo_access}</span></div>
 
               <div className="lp-demo-row">
                 <code>demo@xiberlinc.com</code>
                 <button id="lp-autofill" type="button" onClick={autofill} className="lp-autofill-btn">
-                  Autofill
+                  {t.autofill}
                 </button>
               </div>
 
               <p className="lp-footer-note">
-                New to xiberlinc? <button type="button" className="lp-text-btn">Request access</button>
+                {t.new_to} <button type="button" className="lp-text-btn">{t.request_access}</button>
               </p>
             </>
           )}

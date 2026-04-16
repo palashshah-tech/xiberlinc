@@ -1,14 +1,14 @@
 import { useState, useEffect, useRef } from 'react'
+import { translations } from './translations'
 import './Dashboard.css'
 
-const PRODUCTS = [
+const PRODUCTS = (t) => [
   {
-    id: 'face-eeg',
-    label: '01',
-    name: 'FaceVoice2EEG',
-    category: 'Emotion Intelligence',
-    headline: 'Decode human emotion\nin real time.',
-    body: 'A multimodal neural interface that fuses facial landmark analysis, voice biomarkers, and EEG signals to predict emotional states — arousal, valence, and expectation — with sub-50ms latency.',
+    id: 'fv2eeg',
+    name: t.fv_name,
+    category: t.fv_cat,
+    headline: t.fv_headline,
+    description: t.fv_body,
     stat1: { value: '94.7%', label: 'Model accuracy' },
     stat2: { value: '<50ms', label: 'Round-trip latency' },
     stat3: { value: '1401', label: 'Input features' },
@@ -16,18 +16,17 @@ const PRODUCTS = [
     status: 'Production',
   },
   {
-    id: 'bci-neuro',
-    label: '02',
-    name: 'BCI Neurofeedback',
-    category: 'Cognitive Enhancement',
-    headline: 'Play Space Invaders\nwith your mind.',
-    body: 'The world\'s first neurofeedback-controlled Space Invaders. Your focus and cognitive state drive your ship — hit peak neural performance and watch your score soar. No controller needed. Just your brain.',
-    stat1: { value: 'Real-time', label: 'Brain-state decoding' },
-    stat2: { value: 'Adaptive', label: 'Difficulty engine' },
-    stat3: { value: '∞',       label: 'Play sessions' },
+    id: 'bcinf',
+    name: t.bci_name,
+    category: t.bci_cat,
+    headline: t.bci_headline,
+    description: t.bci_body,
+    stat1: { value: '88ms', label: 'Input delay' },
+    stat2: { value: '4.2', label: 'Avg focus score' },
+    stat3: { value: '12', label: 'Control vectors' },
     accent: '#ffffff',
     status: 'Production',
-  },
+  }
 ]
 
 /* Minimal live EEG line */
@@ -61,67 +60,21 @@ function EEGLine({ color }) {
   )
 }
 
-/* Product card */
-function ProductCard({ product, onOpen }) {
-  const [hov, setHov] = useState(false)
-  return (
-    <div
-      className={`pc ${hov ? 'pc-hov' : ''}`}
-      onMouseEnter={() => setHov(true)}
-      onMouseLeave={() => setHov(false)}
-    >
-      <div className="pc-top">
-        <span className="pc-label">{product.label}</span>
-        <span className="pc-status" style={{ color: product.accent, borderColor: `${product.accent}30` }}>
-          {product.status}
-        </span>
-      </div>
-
-      <div className="pc-category">{product.category}</div>
-      <h3 className="pc-name">{product.name}</h3>
-
-      <div className="pc-eeg">
-        <EEGLine color={product.accent} />
-      </div>
-
-      <pre className="pc-headline">{product.headline}</pre>
-      <p className="pc-body">{product.body}</p>
-
-      <div className="pc-stats">
-        {[product.stat1, product.stat2, product.stat3].map(s => (
-          <div key={s.label} className="pc-stat">
-            <span className="pc-stat-val" style={{ color: product.accent }}>{s.value}</span>
-            <span className="pc-stat-lbl">{s.label}</span>
-          </div>
-        ))}
-      </div>
-
-      <button
-        id={`open-${product.id}`}
-        className="pc-cta"
-        style={{ borderColor: `${product.accent}40`, color: product.accent }}
-        onClick={() => onOpen(product)}
-      >
-        Open {product.name}
-        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
-          <path d="M3 8h10M9 4l4 4-4 4" strokeLinecap="round" strokeLinejoin="round"/>
-        </svg>
-      </button>
-    </div>
-  )
-}
+/* Product card removed - logic integrated into main Dashboard grid for easier localization */
 
 /* Main Dashboard */
-export default function Dashboard({ user, onLogout }) {
+export default function Dashboard({ user, onLogout, lang }) {
+  const t = translations[lang]
   const [active, setActive] = useState(null)
   const [time, setTime]     = useState(new Date())
+  const products = PRODUCTS(t)
 
   useEffect(() => {
     const id = setInterval(() => setTime(new Date()), 1000)
     return () => clearInterval(id)
   }, [])
 
-  if (active) return <Workspace product={active} user={user} onBack={() => setActive(null)} />
+  if (active) return <Workspace product={active} user={user} onBack={() => setActive(null)} lang={lang} />
 
   return (
     <div className="db-root">
@@ -131,9 +84,9 @@ export default function Dashboard({ user, onLogout }) {
           <img src="/logo.svg" alt="xiberlinc" className="db-nav-logo" />
         </div>
         <div className="db-nav-center">
-          <span className="db-nav-item">Platform</span>
-          <span className="db-nav-item">Docs</span>
-          <span className="db-nav-item">Support</span>
+          <span className="db-nav-item">{t.platform}</span>
+          <span className="db-nav-item">{t.docs}</span>
+          <span className="db-nav-item">{t.support}</span>
         </div>
         <div className="db-nav-right">
           <span className="db-nav-time">{time.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</span>
@@ -141,7 +94,7 @@ export default function Dashboard({ user, onLogout }) {
             <div className="db-avatar">{user.name.split(' ').map(n => n[0]).join('').slice(0,2)}</div>
             <span>{user.name.split(' ')[0]}</span>
           </div>
-          <button id="db-signout" className="db-signout" onClick={onLogout}>Sign out</button>
+          <button id="db-signout" className="db-signout" onClick={onLogout}>{t.signout}</button>
         </div>
       </nav>
 
@@ -149,20 +102,20 @@ export default function Dashboard({ user, onLogout }) {
       <div className="db-hero">
         <p className="db-hero-label" style={{ visibility: 'hidden' }}>xiberlinc Platform</p>
         <h1 className="db-hero-h1">
-          Your neural<br />
-          <span className="db-hero-thin">interface suite.</span>
+          {t.neural_suite}<br />
+          <span className="db-hero-thin">{t.interface_suite}</span>
         </h1>
         <p className="db-hero-sub">
-          Two breakthrough products. One platform.
+          {t.breakthrough}
         </p>
       </div>
 
       {/* Stat bar */}
       <div className="db-statbar">
         {[
-          { v: '3',     l: 'Active models' },
-          { v: '43ms',  l: 'Avg latency' },
-          { v: '99.9%', l: 'Uptime SLA' },
+          { v: '3',     l: t.stat_models },
+          { v: '43ms',  l: t.stat_latency },
+          { v: '99.9%', l: t.stat_uptime },
         ].map((s, i) => (
           <div key={i} className="db-statbar-item">
             <span className="db-statbar-val">{s.v}</span>
@@ -174,14 +127,48 @@ export default function Dashboard({ user, onLogout }) {
       {/* Rule */}
       <div className="db-rule" />
 
-      {/* Products */}
+      {/* Products grid */}
       <div className="db-products-head">
-        <span className="db-products-eyebrow">Your products</span>
+        <p className="db-products-eyebrow">{t.products_eyebrow}</p>
       </div>
+
       <div className="db-grid">
-        {PRODUCTS.map((p, i) => (
-          <div key={p.id} style={{ animation: `fadeUp 0.5s var(--ease) ${0.05 + i * 0.1}s both` }}>
-            <ProductCard product={p} onOpen={setActive} />
+        {products.map((p, i) => (
+          <div key={p.id} className="pc" onClick={() => setActive(p)}>
+            <div className="pc-top">
+              <span className="pc-label">0{i+1}</span>
+              <span className="pc-status" style={{ borderColor: `${p.accent}40`, color: p.accent }}>
+                {t.production_badge}
+              </span>
+            </div>
+            
+            <div className="pc-content">
+              <h2 className="pc-name">{p.name}</h2>
+              <div className="pc-eeg">
+                <EEGLine color={p.accent} />
+              </div>
+              <h3 className="pc-headline">{p.headline}</h3>
+              <p className="pc-body">{p.description}</p>
+            </div>
+
+            <div className="pc-footer">
+              <div className="pc-stats">
+                <div className="pc-stat">
+                  <span className="pc-stat-val" style={{ color: p.accent }}>{p.stat1.value}</span>
+                  <span className="pc-stat-lbl">{p.stat1.label}</span>
+                </div>
+                <div className="pc-stat">
+                  <span className="pc-stat-val" style={{ color: p.accent }}>{p.stat2.value}</span>
+                  <span className="pc-stat-lbl">{p.stat2.label}</span>
+                </div>
+              </div>
+              <button className="pc-cta" style={{ borderColor: `${p.accent}40`, color: p.accent }}>
+                {t.open_product}
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M6 12l4-4-4-4" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </button>
+            </div>
           </div>
         ))}
       </div>
@@ -199,23 +186,28 @@ export default function Dashboard({ user, onLogout }) {
 }
 
 /* ── Product Workspace ── */
-function Workspace({ product, user, onBack }) {
+function Workspace({ product, user, onBack, lang }) {
+  const t = translations[lang]
   const [tab, setTab] = useState('overview')
-  const tabs = product.id === 'face-eeg'
-    ? ['overview', 'session', 'history', 'settings']
-    : ['overview', 'protocols', 'leaderboard', 'settings']
+  const tabs = [
+    { id: 'overview', label: t.tab_overview },
+    { id: 'session',  label: t.tab_session },
+    { id: 'records',  label: t.tab_records },
+    { id: 'analysis', label: t.tab_analysis },
+    { id: 'settings', label: t.tab_settings },
+  ]
 
   return (
     <div className="ws-root">
       {/* Space Invaders background for BCI product only */}
-      {product.id === 'bci-neuro' && <SpaceInvadersBg />}
+      {product.id === 'bcinf' && <SpaceInvadersBg />}
 
       <nav className="ws-nav">
         <button id="ws-back" className="ws-back" onClick={onBack}>
           <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
             <path d="M10 4L6 8l4 4" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
-          Dashboard
+          {t.back_to_db}
         </button>
         <div className="ws-nav-title">
           {product.name}
@@ -228,23 +220,23 @@ function Workspace({ product, user, onBack }) {
 
       {/* Tab bar */}
       <div className="ws-tabbar">
-        {tabs.map(t => (
+        {tabs.map(t_item => (
           <button
-            key={t}
-            id={`ws-tab-${t}`}
-            className={`ws-tab ${tab === t ? 'ws-tab-active' : ''}`}
-            onClick={() => setTab(t)}
-            style={tab === t ? { borderBottomColor: product.accent, color: '#fff' } : {}}
+            key={t_item.id}
+            id={`ws-tab-${t_item.id}`}
+            className={`ws-tab ${tab === t_item.id ? 'ws-tab-active' : ''}`}
+            onClick={() => setTab(t_item.id)}
+            style={tab === t_item.id ? { borderBottomColor: product.accent, color: '#fff' } : {}}
           >
-            {t.charAt(0).toUpperCase() + t.slice(1)}
+            {t_item.label}
           </button>
         ))}
       </div>
 
       <div className="ws-body" key={tab}>
         {tab === 'overview'
-          ? <WorkspaceOverview product={product} />
-          : <WorkspacePlaceholder product={product} tab={tab} />
+          ? <WorkspaceOverview product={product} lang={lang} />
+          : <WorkspacePlaceholder product={product} tab={tab} lang={lang} />
         }
       </div>
     </div>
@@ -382,12 +374,13 @@ function SpaceInvadersBg() {
   return <canvas ref={canvasRef} className="si-canvas" />
 }
 
-function WorkspaceOverview({ product }) {
-  const steps = product.id === 'face-eeg'
+function WorkspaceOverview({ product, lang }) {
+  const t = translations[lang]
+  const steps = product.id === 'fv2eeg'
     ? ['Signal capture', 'Feature extraction', 'PCA transform', 'Model inference', 'Emotion output']
     : ['EEG streaming', 'Focus score decoding', 'Neural state mapping', 'Ship control signal', 'Game response']
 
-  const caps = product.id === 'face-eeg'
+  const caps = product.id === 'fv2eeg'
     ? ['467 facial landmarks via MediaPipe', 'WebRTC DataChannel streaming', 'PyTorch inference engine', 'PCA dimensionality reduction (1401→5)', 'Arousal / Valence / Expectation output', 'iOS native WKWebView compatible']
     : ['Pure thought control — no physical input', 'Real-time EEG focus-score drives your ship', 'The harder you concentrate, the more you shoot', 'Adaptive difficulty matches your neural performance', 'Lab Streaming Layer (LSL) integration', 'Leaderboard driven by neurofeedback scores']
 
@@ -398,7 +391,7 @@ function WorkspaceOverview({ product }) {
         <div className="wso-hero-left">
           <p className="wso-cat" style={{ color: product.accent }}>{product.category}</p>
           <pre className="wso-headline">{product.headline}</pre>
-          <p className="wso-body">{product.body}</p>
+          <p className="wso-body">{product.description}</p>
         </div>
         <div className="wso-hero-right">
           <div className="wso-eeg-big">
@@ -417,7 +410,7 @@ function WorkspaceOverview({ product }) {
 
       {/* Pipeline */}
       <div className="wso-section">
-        <p className="wso-section-label">How it works</p>
+        <p className="wso-section-label">{t.pipeline}</p>
         <div className="wso-pipeline">
           {steps.map((step, i) => (
             <div key={step} className="wso-pipe-step">
@@ -431,7 +424,7 @@ function WorkspaceOverview({ product }) {
 
       {/* Features */}
       <div className="wso-section">
-        <p className="wso-section-label">Capabilities</p>
+        <p className="wso-section-label">{t.capabilities}</p>
         <div className="wso-caps">
           {caps.map((cap, i) => (
             <div key={i} className="wso-cap" style={{ borderColor: `${product.accent}18` }}>
@@ -445,18 +438,20 @@ function WorkspaceOverview({ product }) {
   )
 }
 
-function WorkspacePlaceholder({ product, tab }) {
+function WorkspacePlaceholder({ product, tab, lang }) {
+  const t = translations[lang]
   return (
     <div className="wsp-root">
-      <p className="wsp-eyebrow" style={{ color: product.accent }}>Coming next</p>
+      <p className="wsp-eyebrow" style={{ color: product.accent }}>{t.coming_next}</p>
       <h2 className="wsp-title">{tab.charAt(0).toUpperCase() + tab.slice(1)}</h2>
       <p className="wsp-body">
-        This module is being built for the full {product.name} release.<br />
-        This POC demonstrates product architecture and navigation.
+        {t.poc_disclaimer.replace('{name}', product.name).split('\n').map((line, i) => (
+          <span key={i}>{line}{i === 0 && <br />}</span>
+        ))}
       </p>
       <div className="wsp-tags">
-        {['UI designed', 'Backend integration next', 'POC phase'].map(t => (
-          <span key={t} className="wsp-tag" style={{ borderColor: `${product.accent}25`, color: 'rgba(255,255,255,0.4)' }}>{t}</span>
+        {[t.ui_designed, t.backend_next, t.poc_phase].map(tag => (
+          <span key={tag} className="wsp-tag" style={{ borderColor: `${product.accent}25`, color: 'rgba(255,255,255,0.4)' }}>{tag}</span>
         ))}
       </div>
     </div>

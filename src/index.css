@@ -83,3 +83,48 @@ body {
 
 /* ── Utility ── */
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
+
+/* ── Language Toggle ── */
+.lang-toggle-fixed {
+  position: fixed;
+  top: 24px;
+  right: 40px;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0,0,0,0.4);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 6px 14px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--border);
+}
+
+.lang-btn {
+  background: none;
+  border: none;
+  color: var(--txt-muted);
+  font-family: var(--font);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: color 0.2s;
+  padding: 4px;
+}
+
+.lang-btn:hover {
+  color: var(--txt-secondary);
+}
+
+.lang-btn.active {
+  color: var(--white);
+}
+
+.lang-sep {
+  font-size: 10px;
+  color: var(--border-mid);
+  font-weight: 300;
+}
+
