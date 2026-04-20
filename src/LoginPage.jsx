@@ -1,10 +1,9 @@
 import { useState } from 'react'
+import { auth } from './firebase'
+import { signInWithEmailAndPassword } from 'firebase/auth'
 import './LoginPage.css'
 
-const DEMO = { email: 'demo@xiberlinc.com', password: 'xiberlinc2025' }
-const DEMO_USER = { email: 'demo@xiberlinc.com', name: 'Maro Machizawa', plan: 'Professional' }
-
-export default function LoginPage({ onLogin }) {
+export default function LoginPage() {
   const [email, setEmail]       = useState('')
   const [password, setPassword] = useState('')
   const [showPw, setShowPw]     = useState(false)
@@ -16,18 +15,24 @@ export default function LoginPage({ onLogin }) {
     e.preventDefault()
     setError('')
     setLoading(true)
-    await new Promise(r => setTimeout(r, 1100))
-    if (email === DEMO.email && password === DEMO.password) {
+    try {
+      await signInWithEmailAndPassword(auth, email, password)
       setDone(true)
-      await new Promise(r => setTimeout(r, 600))
-      onLogin(DEMO_USER)
-    } else {
-      setError('Incorrect credentials.')
+      // onAuthStateChanged in App.jsx will handle the redirect
+    } catch (err) {
+      const msg = err.code === 'auth/invalid-credential'
+        ? 'Invalid email or password.'
+        : err.code === 'auth/user-not-found'
+        ? 'No account found with this email.'
+        : err.code === 'auth/wrong-password'
+        ? 'Incorrect password.'
+        : err.code === 'auth/too-many-requests'
+        ? 'Too many attempts. Please wait and try again.'
+        : 'Authentication failed. Please try again.'
+      setError(msg)
       setLoading(false)
     }
   }
-
-  const autofill = () => { setEmail(DEMO.email); setPassword(DEMO.password); setError('') }
 
   return (
     <div className="lp-root">
@@ -123,15 +128,6 @@ export default function LoginPage({ onLogin }) {
                   }
                 </button>
               </form>
-
-              <div className="lp-sep"><span>Demo access</span></div>
-
-              <div className="lp-demo-row">
-                <code>demo@xiberlinc.com</code>
-                <button id="lp-autofill" type="button" onClick={autofill} className="lp-autofill-btn">
-                  Autofill
-                </button>
-              </div>
 
               <p className="lp-footer-note">
                 New to xiberlinc? <button type="button" className="lp-text-btn">Request access</button>
