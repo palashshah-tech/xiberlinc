@@ -64,7 +64,7 @@ function EEGLine({ color }) {
 }
 
 /* Product card */
-function ProductCard({ product, onOpen }) {
+function ProductCard({ product, onOpen, user }) {
   const [hov, setHov] = useState(false)
   return (
     <div
@@ -206,7 +206,7 @@ export default function Dashboard({ user }) {
       <div className="db-grid">
         {PRODUCTS.map((p, i) => (
           <div key={p.id} style={{ animation: `fadeUp 0.5s var(--ease) ${0.05 + i * 0.1}s both` }}>
-            <ProductCard product={p} onOpen={setActive} />
+            <ProductCard product={p} onOpen={setActive} user={user} />
           </div>
         ))}
       </div>
