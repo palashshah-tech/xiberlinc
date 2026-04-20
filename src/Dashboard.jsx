@@ -1,4 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
+import { auth } from './firebase'
+import { signOut } from 'firebase/auth'
 import './Dashboard.css'
 
 const PRODUCTS = [
@@ -100,7 +102,13 @@ function ProductCard({ product, onOpen }) {
         id={`open-${product.id}`}
         className="pc-cta"
         style={{ borderColor: `${product.accent}40`, color: product.accent }}
-        onClick={() => onOpen(product)}
+        onClick={() => {
+          if (product.id === 'face-eeg') {
+            window.location.href = 'https://temp-xiber.vercel.app/'
+          } else {
+            onOpen(product)
+          }
+        }}
       >
         Open {product.name}
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
@@ -112,9 +120,20 @@ function ProductCard({ product, onOpen }) {
 }
 
 /* Main Dashboard */
-export default function Dashboard({ user, onLogout }) {
+export default function Dashboard({ user }) {
   const [active, setActive] = useState(null)
   const [time, setTime]     = useState(new Date())
+
+  const userName = user?.displayName || user?.email?.split('@')[0] || 'User'
+  const userInitials = userName.split(' ').map(n => n[0]).join('').slice(0,2).toUpperCase()
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth)
+    } catch (error) {
+      console.error('Logout failed', error)
+    }
+  }
 
   useEffect(() => {
     const id = setInterval(() => setTime(new Date()), 1000)
@@ -138,10 +157,10 @@ export default function Dashboard({ user, onLogout }) {
         <div className="db-nav-right">
           <span className="db-nav-time">{time.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</span>
           <div className="db-user-btn">
-            <div className="db-avatar">{user.name.split(' ').map(n => n[0]).join('').slice(0,2)}</div>
-            <span>{user.name.split(' ')[0]}</span>
+            <div className="db-avatar">{userInitials}</div>
+            <span>{userName}</span>
           </div>
-          <button id="db-signout" className="db-signout" onClick={onLogout}>Sign out</button>
+          <button id="db-signout" className="db-signout" onClick={handleLogout}>Sign out</button>
         </div>
       </nav>
 
@@ -221,7 +240,7 @@ function Workspace({ product, user, onBack }) {
           {product.name}
         </div>
         <div className="ws-nav-right">
-          <span className="ws-plan">{user.name}</span>
+          <span className="ws-plan">{user?.displayName || user?.email?.split('@')[0] || 'User'}</span>
           <img src="/logo.svg" alt="" className="ws-nav-logo" />
         </div>
       </nav>
