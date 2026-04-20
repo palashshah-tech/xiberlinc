@@ -102,9 +102,15 @@ function ProductCard({ product, onOpen }) {
         id={`open-${product.id}`}
         className="pc-cta"
         style={{ borderColor: `${product.accent}40`, color: product.accent }}
-        onClick={() => {
+        onClick={async () => {
           if (product.id === 'face-eeg') {
-            window.location.href = 'https://temp-xiber.vercel.app/'
+            try {
+              const token = await user.getIdToken()
+              window.location.href = `https://temp-xiber.vercel.app/?sso_token=${encodeURIComponent(token)}&sso_email=${encodeURIComponent(user.email)}`
+            } catch (err) {
+              console.error('SSO handoff failed', err)
+              window.location.href = 'https://temp-xiber.vercel.app/'
+            }
           } else {
             onOpen(product)
           }
